@@ -1,3 +1,6 @@
+from random import randint
+
+
 class Agencia:
 
     def __init__(self, telefone, cnpj, numero):
@@ -24,13 +27,38 @@ class Agencia:
         self.clientes.append((nome, cpf, patrimonio))
 
 
-agencia1 = Agencia('11 4111-3333', '111.222.333/001-50', 4568)
+class AgenciaVirtual(Agencia): #Colocar a classe "(mãe)" indica que está criando uma subclasse herdando os métodos dela
 
-agencia1.caixa = 1000000
-agencia1.verificar_caixa()
+    def __init__(self, site, telefone, cnpj): #sempre verificar se o init da subclasse está conversando com o da mãe
+        self.site = site
+        super().__init__(telefone, cnpj, 1000) #vai criar o método init da classe mãe (superclasse)
+        self.caixa = 1000000
+        self.caixa_paypal = 0
 
-agencia1.adicionar_cliente('Ruivo', '11122233301', 10000)
-print(agencia1.clientes)
+    def depositar_paypal(self, valor):
+        self.caixa -= valor
+        self.caixa_paypal += valor
 
-agencia1.emprestar_dinheiro(1500, '11122233301', 0.02)
-print(agencia1.emprestimos)
+    def sacar_paypal(self, valor):
+        self.caixa_paypal -= valor
+        self.caixa += valor
+
+
+class AgenciaComum(Agencia):
+
+    def __init__(self, telefone, cnpj):
+        super().__init__(telefone, cnpj, numero=randint(1001, 9999))
+        self.caixa = 1000000
+
+
+class AgenciaPremium(Agencia):
+
+    def __init__(self, telefone, cnpj):
+        super().__init__(telefone, cnpj, numero=randint(1001, 9999))
+        self.caixa = 10000000
+
+    def adicionar_cliente(self, nome, cpf, patrimonio):
+        if patrimonio > 1000000:
+            super().adicionar_cliente(nome, cpf, patrimonio)
+        else:
+            print('Cliente não tem patrimônio mínimo para entrar na agência premium')
