@@ -1,6 +1,6 @@
 from datetime import datetime
+from random import randint
 import pytz
-import time
 
 class ContaCorrente: 
     """
@@ -65,30 +65,31 @@ class ContaCorrente:
         conta_destino._saldo += valor
         conta_destino._transacoes.append((valor, conta_destino._saldo, ContaCorrente._data_hora()))
 
+class CartaoCredito:
 
-#Programa
-conta_Ruivo = ContaCorrente('Ruivo', '111.222.333-44', 1234, 34062)
-conta_Ruivo.consultar_saldo()
+    @staticmethod
+    def _data_hora():
+        fuso_BR = pytz.timezone('Brazil/East')
+        horario_BR = datetime.now(fuso_BR)
+        return horario_BR
 
-conta_Ruivo.depositar(1000)
-conta_Ruivo.consultar_saldo()
+    def __init__(self, titular, conta_corrente):
+        self.numero = randint(1000000000000000, 9999999999999999)
+        self.titular = titular
+        self.validade = '{}/{}'.format(CartaoCredito._data_hora().month, CartaoCredito._data_hora().year + 4)
+        self.cod_seguranca = '{}{}{}'.format(randint(0,9), randint(0,9), randint(0,9))
+        self.limite = 1000
+        self._senha = '1234'
+        self.conta_corrente = conta_corrente
+        conta_corrente.cartoes.append(self) 
 
-time.sleep(5)
-conta_Ruivo.sacar_dinheiro(750)
+    @property
+    def senha(self):
+        return self._senha
 
-print('Saldo Final:')
-conta_Ruivo.consultar_saldo()
-conta_Ruivo.consultar_limite_chequespecial()
-
-print('-' * 20)
-print(conta_Ruivo.consultar_historico_transacoes())
-
-print('-' * 20)
-conta_talita = ContaCorrente('Talita', '111.222.333-55', 1234, 34063)
-conta_Ruivo.transferir(200, conta_talita)
-
-conta_Ruivo.consultar_saldo()
-conta_talita.consultar_saldo()
-
-conta_Ruivo.consultar_historico_transacoes()
-conta_talita.consultar_historico_transacoes()
+    @senha.setter
+    def senha(self, valor):
+        if len(valor) == 4 and valor.isnumeric():
+            self._senha = valor
+        else:
+            print('Nova senha inválida')
